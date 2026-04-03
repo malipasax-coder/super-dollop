@@ -3,723 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gelişmiş Trendyol Müşteri Hizmetleri Simülasyonu</title>
+    <title>Mali HQ - CEO Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        :root {
-            --trendyol-orange: #F27A1A;
-            --bg-color: #F5F5F5;
-            --panel-bg: #FFFFFF;
-            --text-dark: #333333;
-            --text-light: #666666;
-            --border-color: #E2E2E2;
-            --success: #0bc15c;
-            --danger: #dc3545;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            background-color: #333;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 4px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            font-size: 14px;
-            opacity: 0;
-            transform: translateX(100%);
-            animation: slideIn 0.3s forwards;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .toast.success { border-left: 5px solid var(--success); }
-        .toast.warning { border-left: 5px solid var(--trendyol-orange); }
-
-        @keyframes slideIn {
-            to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideOut {
-            to { opacity: 0; transform: translateX(100%); }
-        }
-
-        /* Header */
-        header {
-            background-color: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 10px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 60px;
-        }
-
-        .logo {
-            color: var(--trendyol-orange);
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .agent-controls {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        select#status-select {
-            padding: 5px 10px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            outline: none;
-            font-weight: bold;
-        }
-
-        .agent-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            background: #f9f9f9;
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--success);
-            border-radius: 50%;
-            transition: background-color 0.3s;
-        }
-
-        /* Main Layout */
-        .container {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 60px);
-        }
-
-        /* Left Sidebar - Queue */
-        .sidebar {
-            width: 280px;
-            background-color: var(--panel-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-header {
-            padding: 15px;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            background-color: #FAFAFA;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .queue-list {
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .queue-item {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background 0.2s;
-            position: relative;
-        }
-
-        .queue-item:hover, .queue-item.active {
-            background-color: #FFF3EB;
-            border-left: 4px solid var(--trendyol-orange);
-        }
-
-        .queue-item h4 { font-size: 14px; margin-bottom: 5px; }
-        .queue-item p { font-size: 12px; color: var(--text-light); }
-        
-        .unread-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--trendyol-orange);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        /* Chat Area */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background-color: #EFEFEF;
-            position: relative;
-        }
-
-        .chat-header {
-            padding: 15px 20px;
-            background-color: var(--panel-bg);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            z-index: 10;
-        }
-
-        .action-btns button {
-            padding: 6px 12px;
-            margin-left: 5px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-            transition: opacity 0.2s;
-        }
-        .btn-end { background: var(--danger); color: white; }
-        .btn-transfer { background: #6c757d; color: white; }
-
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background-image: url('data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23000000" fill-opacity="0.03" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E');
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.4;
-            position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .message.customer {
-            background-color: var(--panel-bg);
-            align-self: flex-start;
-            border-bottom-left-radius: 0;
-        }
-
-        .message.agent {
-            background-color: var(--trendyol-orange);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 0;
-        }
-
-        .msg-time {
-            font-size: 10px;
-            margin-top: 5px;
-            opacity: 0.7;
-            text-align: right;
-        }
-
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            background-color: var(--panel-bg);
-            padding: 10px 15px;
-            border-radius: 20px;
-            border-bottom-left-radius: 0;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .typing-indicator span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background-color: #999;
-            border-radius: 50%;
-            margin: 0 2px;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        .chat-input-area {
-            padding: 15px 20px;
-            background-color: var(--panel-bg);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            outline: none;
-            font-size: 14px;
-        }
-
-        .chat-input-area input:focus { border-color: var(--trendyol-orange); }
-
-        .chat-input-area button {
-            background-color: var(--trendyol-orange);
-            color: white;
-            border: none;
-            padding: 0 25px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        .chat-input-area button:hover { background-color: #d66812; }
-
-        /* Right Sidebar - Customer Info & Tools */
-        .info-panel {
-            width: 320px;
-            background-color: var(--panel-bg);
-            border-left: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--border-color);
-            background: #FAFAFA;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 12px 0;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            color: var(--text-light);
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab.active {
-            color: var(--trendyol-orange);
-            border-bottom-color: var(--trendyol-orange);
-            background: white;
-        }
-
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-        }
-
-        .info-section { margin-bottom: 20px; }
-        .info-section h3 { font-size: 13px; color: var(--text-light); margin-bottom: 10px; text-transform: uppercase; }
-        .info-row { margin-bottom: 8px; font-size: 13px; display: flex; justify-content: space-between;}
-        .info-row strong { color: var(--text-dark); }
-
-        .product-card {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-top: 10px;
-            background: #fff;
-        }
-
-        .action-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .action-grid button {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            background: white;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .action-grid button:hover {
-            border-color: var(--trendyol-orange);
-            color: var(--trendyol-orange);
-            background: #FFF3EB;
-        }
-
-        .agent-notes {
-            width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            resize: none;
-            font-size: 13px;
-            margin-top: 10px;
-        }
-
-        .quick-replies {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 10px;
-        }
-
-        .quick-reply-btn {
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .quick-reply-btn:hover { background: #e0e0e0; }
-
-        .badge {
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            background-color: #E8F5E9;
-            color: #2E7D32;
-        }
-
+        body { background-color: #020617; color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+        .login-screen { display: flex; }
+        .main-dashboard { display: none; }
+        /* Sekme Tasarımı */
+        .tab-btn { padding: 10px 20px; color: #64748b; font-weight: bold; border-bottom: 2px solid transparent; transition: 0.3s; }
+        .tab-btn.active { color: #6366f1; border-color: #6366f1; }
     </style>
 </head>
-<body>
+<body class="bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]">
 
-    <div id="toast-container"></div>
-
-    <header>
-        <div class="logo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#F27A1A"/>
-                <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="#F27A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            trendyol <span style="font-size: 14px; font-weight: normal; color: #666; margin-left: 5px;">Müşteri İletişim Merkezi</span>
+    <div id="login-layer" class="login-screen fixed inset-0 z-50 items-center justify-center bg-slate-950/90 backdrop-blur-sm">
+        <div class="glass p-10 rounded-3xl w-full max-w-md text-center shadow-2xl border-t-4 border-indigo-500">
+            <h1 class="text-3xl font-black mb-6 text-indigo-500 italic uppercase">KOMUTA MERKEZİ</h1>
+            <input type="password" id="pass-input" placeholder="Yönetici Şifresi" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl mb-4 text-center focus:outline-none focus:border-indigo-500 text-white font-bold tracking-widest">
+            <button onclick="checkAuth()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-4 rounded-xl font-bold transition-all uppercase tracking-widest shadow-lg shadow-indigo-900/50">Giriş Yap</button>
+            <p id="error-msg" class="text-red-500 mt-4 hidden font-bold">Hatalı Şifre!</p>
         </div>
-        <div class="agent-controls">
-            <select id="status-select" onchange="changeStatus()">
-                <option value="online">🟢 Çevrimiçi</option>
-                <option value="break">🟡 Molada</option>
-                <option value="lunch">🍲 Yemekte</option>
-            </select>
-            <div class="agent-info">
-                <div class="status-dot" id="header-status-dot"></div>
-                Temsilci: Mali
-            </div>
-        </div>
-    </header>
+    </div>
 
-    <div class="container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <span>Kuyruk</span>
-                <span style="background: var(--trendyol-orange); color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px;">2</span>
-            </div>
-            <div class="queue-list">
-                <div class="queue-item active">
-                    <h4>Ayşe Yılmaz</h4>
-                    <p>Sipariş Teslimatı Hakkında</p>
-                    <p style="font-size: 10px; margin-top: 5px; color: #999;">Görüşülüyor - 02:15</p>
-                </div>
-                <div class="queue-item" onclick="showToast('Önce mevcut görüşmeyi sonlandırmalısınız.', 'warning')">
-                    <h4>Mehmet Demir</h4>
-                    <p>Kusurlu Ürün İadesi</p>
-                    <p style="font-size: 10px; margin-top: 5px; color: #999;">Bekleme: 04:30</p>
-                    <div class="unread-badge">1</div>
-                </div>
-                <div class="queue-item" onclick="showToast('Önce mevcut görüşmeyi sonlandırmalısınız.', 'warning')">
-                    <h4>Elif Şahin</h4>
-                    <p>Kupon Kullanımı</p>
-                    <p style="font-size: 10px; margin-top: 5px; color: #999;">Bekleme: 00:45</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-area">
-            <div class="chat-header">
+    <div id="dashboard-layer" class="main-dashboard p-4 md:p-8">
+        <div class="max-w-7xl mx-auto">
+            
+            <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-6">
                 <div>
-                    <strong style="font-size: 16px;">Ayşe Yılmaz</strong>
-                    <span style="font-size: 12px; color: #666; display: block; margin-top: 2px;">Mobil Uygulama (iOS) üzerinden bağlı</span>
+                    <h1 class="text-3xl font-black uppercase tracking-tighter">MALI <span class="text-indigo-500">HQ</span></h1>
+                    <p class="text-sm text-slate-400 mt-1">Sosyal Medya & İstihbarat Yönetimi</p>
                 </div>
-                <div class="action-btns">
-                    <button class="btn-transfer" onclick="showToast('Görüşme 2. Seviye Destek ekibine aktarılıyor...', 'success')">Aktar</button>
-                    <button class="btn-end" onclick="endChat()">Görüşmeyi Sonlandır</button>
+                <div class="text-right">
+                    <button id="google-auth-btn" onclick="authorizeGoogle()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-6 rounded-xl shadow-lg flex items-center gap-2 text-sm uppercase tracking-widest transition-all mb-2">
+                        <span>Verileri Çek (Google)</span>
+                    </button>
+                    <p class="text-xs text-green-500 font-bold uppercase tracking-widest">Bağlantı Aktif</p>
                 </div>
-            </div>
-            
-            <div class="chat-messages" id="chatBox">
-                <div style="text-align: center; width: 100%; margin: 10px 0;">
-                    <span style="font-size: 11px; color: #666; background: #e0e0e0; padding: 4px 12px; border-radius: 12px;">Görüşme Başladı - Bot Asistan Aktarıldı</span>
-                </div>
+            </header>
 
-                <div class="message customer">
-                    Merhaba, 2 gün önce verdiğim sipariş hala "Hazırlanıyor" görünüyor. Neden kargoya verilmedi?
-                    <div class="msg-time">14:30</div>
-                </div>
-
-                <div class="message agent">
-                    Merhaba Ayşe Hanım, Trendyol Canlı Destek'e hoş geldiniz. Ben Mali, size yardımcı olmaktan memnuniyet duyarım. Hemen siparişinizi kontrol ediyorum.
-                    <div class="msg-time">14:31</div>
-                </div>
-            </div>
-
-            <div class="typing-indicator" id="typingIndicator">
-                <span></span><span></span><span></span>
-            </div>
-
-            <div class="chat-input-area">
-                <div class="quick-replies">
-                    <button class="quick-reply-btn" onclick="insertText('Siparişiniz satıcı firmaya iletilmiş olup paketlenme aşamasındadır.')">Paketleniyor</button>
-                    <button class="quick-reply-btn" onclick="insertText('Gecikme için özür dileriz, durumu satıcı firmaya aciliyetle iletiyorum.')">Aciliyet Bildir</button>
-                    <button class="quick-reply-btn" onclick="insertText('Başka yardımcı olabileceğim bir konu var mıdır?')">Kapanış</button>
-                </div>
-                <div class="input-wrapper" style="margin-top: 10px;">
-                    <input type="text" id="messageInput" placeholder="Mesajınızı yazın..." onkeypress="handleKeyPress(event)" autocomplete="off">
-                    <button onclick="sendAgentMessage()">Gönder</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="info-panel">
-            <div class="tabs">
-                <div class="tab active">Müşteri & Sipariş</div>
-            </div>
-            
-            <div class="tab-content">
-                <div class="info-section">
-                    <h3>Müşteri Profili</h3>
-                    <div class="info-row">
-                        <span>Ad Soyad</span>
-                        <strong>Ayşe Yılmaz</strong>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                
+                <div class="glass p-6 rounded-3xl border-l-4 border-red-500">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-white uppercase tracking-tighter">YouTube Analitiği</h3>
+                        <span class="bg-red-500/20 text-red-400 text-xs py-1 px-3 rounded-full font-bold">CANLI BAĞLANTI</span>
                     </div>
-                    <div class="info-row">
-                        <span>Segment</span>
-                        <strong style="color: var(--trendyol-orange);">Elite Müşteri</strong>
-                    </div>
-                    <div class="info-row">
-                        <span>Son 1 Ay Alışverişi</span>
-                        <strong>4.250 TL</strong>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h3>İlgili Sipariş (#TY-98765)</h3>
-                    <div class="product-card">
-                        <div style="font-size: 13px; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;">
-                            X-Teknoloji <span style="float:right; color: #f4b400;">★ 9.4</span>
+                    <p class="text-sm text-slate-400 mb-4" id="channel-name-display">Google ile yetkilendirme bekleniyor...</p>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-slate-900/50 p-4 rounded-2xl text-center">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Abone</p>
+                            <p class="text-2xl font-black text-white" id="real-subs">0</p>
                         </div>
-                        <div style="display: flex; gap: 10px;">
-                            <div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🎧</div>
-                            <div>
-                                <h4 style="font-size: 12px; margin-bottom: 2px;">Kablosuz Kulaklık ANC</h4>
-                                <p style="font-size: 11px; color: #666;">Fiyat: 899 TL | Adet: 1</p>
-                                <span class="badge" style="margin-top: 5px; display: inline-block;">Hazırlanıyor</span>
+                        <div class="bg-slate-900/50 p-4 rounded-2xl text-center">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">İzlenme</p>
+                            <p class="text-2xl font-black text-white" id="real-views">0</p>
+                        </div>
+                        <div class="bg-slate-900/50 p-4 rounded-2xl text-center">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Video</p>
+                            <p class="text-2xl font-black text-white" id="real-videos">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-3xl border-l-4 border-cyan-500 relative overflow-hidden group">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold text-white uppercase tracking-tighter">TikTok Analitiği</h3>
+                        <span class="bg-slate-800 text-slate-400 text-xs py-1 px-3 rounded-full font-bold">SUNUCU BEKLENİYOR</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <input type="text" placeholder="@KullaniciAdin" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:outline-none w-1/2">
+                        <button class="bg-cyan-600 text-white text-sm font-bold py-2 px-4 rounded-lg opacity-50 cursor-not-allowed">Bağla</button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 opacity-40">
+                        <div class="bg-slate-900/50 p-4 rounded-2xl text-center">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Takipçi</p>
+                            <p class="text-2xl font-black text-cyan-400">---</p>
+                        </div>
+                        <div class="bg-slate-900/50 p-4 rounded-2xl text-center">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Beğeni</p>
+                            <p class="text-2xl font-black text-cyan-400">---</p>
+                        </div>
+                        <div class="bg-slate-900/50 p-4 rounded-2xl text-center">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Erişim</p>
+                            <p class="text-2xl font-black text-cyan-400">---</p>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-slate-950/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p class="text-sm font-bold text-cyan-400 bg-slate-900 px-4 py-2 rounded-lg border border-cyan-800">Şirket sunucusu (VDS) alındığında aktif edilecek.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="glass rounded-3xl border border-slate-800 p-2">
+                <div class="flex border-b border-slate-800 p-4">
+                    <button class="tab-btn active" onclick="switchTab('radar')">YOUTUBE RAKİP RADARI</button>
+                    <button class="tab-btn" onclick="switchTab('trends')">TOPLULUK & TRENDLER</button>
+                </div>
+
+                <div class="p-6">
+                    <div id="tab-radar" class="space-y-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <p class="text-sm text-slate-400">Anlık canlı yayın yapan rakipler (İzleyiciye göre)</p>
+                            <button onclick="updateRadar()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 px-4 rounded-lg font-bold uppercase">Yenile</button>
+                        </div>
+                        <div id="radar-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto">
+                            </div>
+                    </div>
+
+                    <div id="tab-trends" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
+                                <h4 class="font-bold text-indigo-400 mb-4 uppercase tracking-widest">Discord Gözetimi</h4>
+                                <p class="text-xs text-slate-500 mb-4">Hedef sunucu ID'leri girildiğinde aktif online sayısı çeker.</p>
+                                <input type="text" placeholder="Hedef Discord Server ID" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-white mb-2">
+                                <button class="w-full bg-indigo-900/50 text-indigo-300 font-bold py-2 rounded-lg text-sm border border-indigo-800">Takibe Al</button>
+                            </div>
+                            <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-800">
+                                <h4 class="font-bold text-pink-400 mb-4 uppercase tracking-widest">Metin2 Sosyal Ağ Trendleri</h4>
+                                <p class="text-xs text-slate-500 mb-4">Web Scraper (Python) bağlandığında aktifleşir.</p>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center bg-slate-950 p-3 rounded-lg"><span class="text-sm">#Rohan2</span><span class="text-xs text-green-400">Trend ↑</span></div>
+                                    <div class="flex justify-between items-center bg-slate-950 p-3 rounded-lg"><span class="text-sm">#YeniSunucu</span><span class="text-xs text-slate-500">Stabil -</span></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="action-grid">
-                        <button onclick="performAction('Kupon', 'Müşteriye 50 TL Gecikme Özür Kuponu tanımlandı.')">
-                            🎟️ Kupon Tanımla
-                        </button>
-                        <button onclick="performAction('İade', 'Sipariş için iade kodu oluşturuldu ve SMS ile iletildi.')">
-                            🔄 İade Kodu Ver
-                        </button>
-                        <button onclick="performAction('İptal', 'Sipariş iptal talebi satıcıya iletildi.', 'warning')">
-                            ❌ İptal Talebi
-                        </button>
-                        <button onclick="performAction('Aciliyet', 'Satıcı paneline acil gönderim notu düşüldü.')">
-                            ⚡ Aciliyet Bildir
-                        </button>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h3>Temsilci Notu</h3>
-                    <p style="font-size: 11px; color: #666; margin-bottom: 5px;">Görüşme sonu CRM'e kaydedilecektir.</p>
-                    <textarea class="agent-notes" placeholder="Müşteri şikayeti/talebi hakkında notlarınızı buraya ekleyin..."></textarea>
-                    <button style="width: 100%; margin-top: 5px; padding: 8px; background: #eee; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;" onclick="showToast('Not kaydedildi.', 'success')">Notu Kaydet</button>
                 </div>
             </div>
+
         </div>
     </div>
 
     <script>
-        // Müşteri botunun vereceği olası cevapların senaryosu
-        const botReplies = [
-            "Anladım, peki ne zaman kargoya verilir net bir tarih var mı?",
-            "Peki, beklemek durumundayım o halde. Teşekkürler.",
-            "Hayır, başka bir sorum yok. Kolay gelsin.",
-            "Görüşürüz, iyi çalışmalar."
-        ];
-        let botReplyIndex = 0;
+        const YT_RADAR_KEY = "AIzaSyAH6zquJ9cC_vj2QTsKyYJW8tBWW6F4WWI"; 
+        const GOOGLE_CLIENT_ID = "419199949836-b07h29322b9rufpsop7g898dn4cne0vf.apps.googleusercontent.com"; 
 
-        function getTimeString() {
-            const now = new Date();
-            return now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-        }
-
-        function sendAgentMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            
-            if (message !== "") {
-                const chatBox = document.getElementById('chatBox');
-                
-                // Temsilci mesajını ekle
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'message agent';
-                messageDiv.innerHTML = `${message} <div class="msg-time">${getTimeString()}</div>`;
-                chatBox.appendChild(messageDiv);
-                
-                // Scrollu aşağı çek
-                chatBox.scrollTop = chatBox.scrollHeight;
-                input.value = "";
-
-                // Müşteri Botu Animasyonu ve Cevabı Tetikle
-                if(botReplyIndex < botReplies.length) {
-                    setTimeout(() => {
-                        document.getElementById('typingIndicator').style.display = 'flex';
-                        chatBox.scrollTop = chatBox.scrollHeight;
-                        
-                        setTimeout(() => {
-                            document.getElementById('typingIndicator').style.display = 'none';
-                            receiveCustomerMessage();
-                        }, 2000); // 2 saniye yazıyor animasyonu
-
-                    }, 1000);
-                }
-            }
-        }
-
-        function receiveCustomerMessage() {
-            const chatBox = document.getElementById('chatBox');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message customer';
-            
-            messageDiv.innerHTML = `${botReplies[botReplyIndex]} <div class="msg-time">${getTimeString()}</div>`;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            botReplyIndex++;
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') { sendAgentMessage(); }
-        }
-
-        function insertText(text) {
-            const input = document.getElementById('messageInput');
-            input.value = text;
-            input.focus();
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icon = type === 'success' ? '✅' : '⚠️';
-            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
-            
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s forwards';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function performAction(actionName, successMessage, type = 'success') {
-            showToast(successMessage, type);
-            // CRM Notuna otomatik log ekle
-            const notesArea = document.querySelector('.agent-notes');
-            notesArea.value += `[Sistem]: ${actionName} işlemi yapıldı.\n`;
-        }
-
-        function changeStatus() {
-            const select = document.getElementById('status-select');
-            const dot = document.getElementById('header-status-dot');
-            
-            if(select.value === 'online') {
-                dot.style.backgroundColor = 'var(--success)';
-                showToast('Durum: Çevrimiçi olarak güncellendi.', 'success');
-            } else if(select.value === 'break') {
-                dot.style.backgroundColor = '#ffc107'; // Yellow
-                showToast('Durum: Molada. Yeni çağrı gelmeyecek.', 'warning');
+        function checkAuth() {
+            const pass = document.getElementById('pass-input').value;
+            if(pass === "Mali2026") { 
+                document.getElementById('login-layer').style.display = 'none';
+                document.getElementById('dashboard-layer').style.display = 'block';
+                updateRadar();
             } else {
-                dot.style.backgroundColor = '#dc3545'; // Red
-                showToast('Durum: Yemekte. Yeni çağrı gelmeyecek.', 'warning');
+                document.getElementById('error-msg').classList.remove('hidden');
             }
         }
 
-        function endChat() {
-            if(confirm("Bu görüşmeyi sonlandırmak istediğinize emin misiniz?")) {
-                showToast("Görüşme sonlandırıldı. Çağrı özetine yönlendiriliyorsunuz...", "success");
-                setTimeout(() => {
-                    document.getElementById('chatBox').innerHTML += `
-                    <div style="text-align: center; width: 100%; margin: 10px 0;">
-                        <span style="font-size: 11px; color: #dc3545; background: #f8d7da; padding: 4px 12px; border-radius: 12px;">Görüşme Temsilci Tarafından Kapatıldı - ${getTimeString()}</span>
-                    </div>`;
-                    document.querySelector('.chat-input-area').style.opacity = '0.5';
-                    document.querySelector('.chat-input-area').style.pointerEvents = 'none';
-                }, 1000);
+        // Sekme Değiştirme
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('tab-radar').classList.add('hidden');
+            document.getElementById('tab-trends').classList.add('hidden');
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+        }
+
+        let tokenClient;
+        let accessToken = null;
+
+        window.onload = function () {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: GOOGLE_CLIENT_ID,
+                scope: 'https://www.googleapis.com/auth/youtube.readonly',
+                callback: (tokenResponse) => {
+                    if (tokenResponse && tokenResponse.access_token) {
+                        accessToken = tokenResponse.access_token;
+                        document.getElementById('google-auth-btn').style.display = 'none';
+                        fetchMyRealData(); 
+                    }
+                },
+            });
+        };
+
+        function authorizeGoogle() { tokenClient.requestAccessToken(); }
+
+        async function fetchMyRealData() {
+            try {
+                document.getElementById('channel-name-display').innerText = "Veriler senkronize ediliyor...";
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&mine=true`, {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                const data = await res.json();
+                if (data.items && data.items.length > 0) {
+                    const stats = data.items[0].statistics;
+                    document.getElementById('channel-name-display').innerText = "Bağlı Kanal: " + data.items[0].snippet.title;
+                    document.getElementById('real-subs').innerText = Number(stats.subscriberCount).toLocaleString('tr-TR');
+                    document.getElementById('real-views').innerText = Number(stats.viewCount).toLocaleString('tr-TR');
+                    document.getElementById('real-videos').innerText = Number(stats.videoCount).toLocaleString('tr-TR');
+                }
+            } catch (error) {
+                document.getElementById('channel-name-display').innerText = "Bağlantı hatası.";
+            }
+        }
+
+        async function updateRadar() {
+            const list = document.getElementById('radar-list');
+            list.innerHTML = '<p class="col-span-2 text-center text-slate-500 py-4 animate-pulse">YouTube taranıyor...</p>';
+            try {
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&eventType=live&type=video&q=Metin2&order=viewCount&maxResults=10&key=${YT_RADAR_KEY}`);
+                const data = await res.json();
+                if(data.items) {
+                    list.innerHTML = data.items.map((v, i) => `
+                        <div class="p-3 bg-slate-900 rounded-xl border border-slate-700/50 flex justify-between items-center">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="text-xl font-black text-red-900">#${i+1}</span>
+                                <div class="truncate">
+                                    <p class="font-bold text-white text-xs truncate">${v.snippet.channelTitle}</p>
+                                </div>
+                            </div>
+                            <a href="https://youtube.com/watch?v=${v.id.videoId}" target="_blank" class="bg-red-600 hover:bg-red-500 text-white px-2 py-1 rounded text-[10px] font-bold uppercase">İzle</a>
+                        </div>
+                    `).join('');
+                }
+            } catch {
+                list.innerHTML = '<p class="col-span-2 text-center text-red-500 py-4">Bağlantı Hatası!</p>';
             }
         }
     </script>
