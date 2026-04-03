@@ -11,21 +11,13 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; overflow-x: hidden; }
-        
-        /* Cam Tasarımı */
         .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .glass-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
         .glass-card:hover { border-color: rgba(99, 102, 241, 0.5); background: rgba(30, 41, 59, 0.8); }
-        
-        /* Mobil Menü Animasyonları */
         #sidebar { transition: transform 0.3s ease-in-out; }
         #sidebar-overlay { transition: opacity 0.3s ease-in-out; }
         .nav-item.active { background: linear-gradient(90deg, rgba(99,102,241,0.2) 0%, transparent 100%); border-left: 4px solid #6366f1; color: #fff; }
-        
-        /* Mobilde Yatay Taşmayı Engelleme */
         * { box-sizing: border-box; max-width: 100%; }
-        
-        /* Grafik Konteynerleri */
         .chart-container { position: relative; height: 200px; width: 100%; }
         @media (min-width: 768px) { .chart-container { height: 250px; } }
     </style>
@@ -39,14 +31,13 @@
             </div>
             <h1 class="text-2xl md:text-3xl font-black mb-2 text-white uppercase tracking-widest">MALI <span class="text-indigo-500">HQ</span></h1>
             <p class="text-[10px] md:text-xs text-slate-400 mb-6 uppercase tracking-widest">Sistem Yöneticisi Girişi</p>
-            <input type="password" id="admin-pass" placeholder="Şifre" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 md:py-4 mb-4 text-center text-white focus:outline-none focus:border-indigo-500 font-mono tracking-widest transition-all text-sm md:text-base">
+            <input type="password" id="admin-pass" placeholder="Şifre (Mali2026)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 md:py-4 mb-4 text-center text-white focus:outline-none focus:border-indigo-500 font-mono tracking-widest transition-all text-sm md:text-base">
             <button onclick="login()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 md:py-4 rounded-xl uppercase tracking-widest transition-all shadow-lg text-sm md:text-base">Yetkilendir</button>
             <p id="login-error" class="text-red-500 mt-4 text-xs font-bold hidden">Erişim Reddedildi</p>
         </div>
     </div>
 
     <div id="main-app" class="hidden flex h-screen overflow-hidden w-full relative">
-        
         <div id="sidebar-overlay" onclick="toggleMenu()" class="fixed inset-0 bg-slate-950/80 z-40 hidden opacity-0 lg:hidden"></div>
         
         <aside id="sidebar" class="w-64 md:w-72 glass-panel h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 flex flex-col shadow-2xl lg:shadow-none border-r border-slate-800">
@@ -65,12 +56,15 @@
             </nav>
 
             <div class="p-4 md:p-6 border-t border-slate-800">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-400 font-black border border-indigo-500/50">M</div>
-                    <div>
-                        <p class="text-xs md:text-sm font-bold text-white">Yönetici Aktif</p>
-                        <p class="text-[10px] text-green-500 font-mono"><i class="fa-solid fa-circle text-[6px] animate-pulse mr-1"></i>Çevrimiçi</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-900/50 flex items-center justify-center text-indigo-400 font-black border border-indigo-500/50">M</div>
+                        <div>
+                            <p class="text-xs md:text-sm font-bold text-white">Yönetici Aktif</p>
+                            <p class="text-[10px] text-green-500 font-mono"><i class="fa-solid fa-circle text-[6px] animate-pulse mr-1"></i>Çevrimiçi</p>
+                        </div>
                     </div>
+                    <button onclick="logout()" class="text-red-500 hover:text-red-400 p-2 rounded-lg bg-red-950/30 border border-red-900/50 transition-all"><i class="fa-solid fa-power-off"></i></button>
                 </div>
             </div>
         </aside>
@@ -85,7 +79,7 @@
                 <div class="flex items-center gap-2 md:gap-4">
                     <p id="clock" class="hidden sm:block text-slate-400 font-mono text-xs tracking-widest">00:00</p>
                     <button id="google-login-btn" onclick="authorizeGoogle()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase shadow-lg shadow-red-900/30 flex items-center gap-1.5 transition-all">
-                        <i class="fa-brands fa-youtube text-sm md:text-lg"></i> <span class="hidden sm:inline">YouTube Bağla</span><span class="sm:hidden">Bağla</span>
+                        <i class="fa-brands fa-youtube text-sm md:text-lg"></i> <span id="google-btn-text" class="hidden sm:inline">YouTube Bağla</span><span class="sm:hidden">Bağla</span>
                     </button>
                 </div>
             </header>
@@ -93,7 +87,6 @@
             <div class="p-4 md:p-6 pb-20 w-full overflow-x-hidden">
                 
                 <div id="view-overview" class="space-y-4 md:space-y-6">
-                    
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
                         <div class="glass-card p-4 md:p-6 rounded-2xl relative overflow-hidden col-span-2 md:col-span-1">
                             <div class="absolute top-0 right-0 p-3 opacity-10"><i class="fa-solid fa-users text-4xl md:text-6xl"></i></div>
@@ -181,15 +174,32 @@
     <script>
         const GOOGLE_CLIENT_ID = "419199949836-b07h29322b9rufpsop7g898dn4cne0vf.apps.googleusercontent.com"; 
         const YT_RADAR_KEY = "AIzaSyAH6zquJ9cC_vj2QTsKyYJW8tBWW6F4WWI"; 
-        const GEMINI_API_KEY = "AIzaSyAyKhEPqCXsi9dhloExXqf4tMEvuS-9ha0"; // GEMINI AI ANAHTARI EKLENDİ
+        const GEMINI_API_KEY = "AIzaSyAyKhEPqCXsi9dhloExXqf4tMEvuS-9ha0"; 
         
         let tokenClient;
         let accessToken = null;
         let pieChartObj = null;
 
+        // HAFIZA KONTROLÜ (SAYFA YÜKLENDİĞİNDE)
+        window.onload = function() {
+            if(localStorage.getItem('mali_hq_auth') === 'true') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                initSystem();
+            }
+            
+            // Google Script'i manuel yüklüyoruz ki buton düzgün çalışsspan
+            const script = document.createElement('script');
+            script.src = "https://accounts.google.com/gsi/client";
+            script.onload = initGoogleAuth;
+            document.body.appendChild(script);
+        }
+
+        // GİRİŞ YAP & HAFIZAYA KAYDET
         function login() {
             const pass = document.getElementById('admin-pass').value;
             if(pass === "Mali2026") {
+                localStorage.setItem('mali_hq_auth', 'true'); // Şifreyi hafızaya al
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 initSystem();
@@ -198,10 +208,16 @@
             }
         }
 
+        // ÇIKIŞ YAP & HAFIZAYI SİL
+        function logout() {
+            localStorage.removeItem('mali_hq_auth');
+            localStorage.removeItem('mali_hq_yt_data');
+            window.location.reload();
+        }
+
         function toggleMenu() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            
             if (sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -236,20 +252,42 @@
         function initSystem() {
             renderCharts(); 
             
+            // Eğer daha önce veriler çekildiyse hafızadan yükle
+            const savedData = localStorage.getItem('mali_hq_yt_data');
+            if(savedData) {
+                const data = JSON.parse(savedData);
+                document.getElementById('channel-name-txt').innerHTML = `<i class="fa-solid fa-check-circle text-green-400 mr-1"></i> ${data.title}`;
+                document.getElementById('stat-subs').innerText = data.subs > 9999 ? (data.subs/1000).toFixed(1)+'K' : data.subs;
+                document.getElementById('stat-views').innerText = data.views > 999999 ? (data.views/1000000).toFixed(1)+'M' : (data.views > 999 ? (data.views/1000).toFixed(1)+'K' : data.views);
+                document.getElementById('stat-videos').innerText = data.videos;
+                
+                // Butonu Güncelle Butonuna Çevir
+                const btn = document.getElementById('google-login-btn');
+                btn.innerHTML = `<i class="fa-solid fa-rotate text-sm md:text-lg"></i> <span class="hidden sm:inline">Verileri Yenile</span><span class="sm:hidden">Yenile</span>`;
+                btn.classList.replace('bg-red-600', 'bg-indigo-600');
+                btn.classList.replace('hover:bg-red-500', 'hover:bg-indigo-500');
+
+                generateAIStrategy(data.subs, data.views, data.videos);
+                updatePieChart(data.views);
+            }
+        }
+
+        function initGoogleAuth() {
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: GOOGLE_CLIENT_ID,
                 scope: 'https://www.googleapis.com/auth/youtube.readonly',
                 callback: (tokenResponse) => {
                     if (tokenResponse && tokenResponse.access_token) {
                         accessToken = tokenResponse.access_token;
-                        document.getElementById('google-login-btn').classList.add('hidden');
                         fetchMyRealData(); 
                     }
                 },
             });
         }
 
-        function authorizeGoogle() { tokenClient.requestAccessToken(); }
+        function authorizeGoogle() { 
+            if(tokenClient) tokenClient.requestAccessToken(); 
+        }
 
         async function fetchMyRealData() {
             try {
@@ -266,20 +304,22 @@
                     const viewCount = Number(stats.viewCount);
                     const videoCount = Number(stats.videoCount);
 
-                    document.getElementById('channel-name-txt').innerHTML = `<i class="fa-solid fa-check-circle text-green-400 mr-1"></i> ${snippet.title}`;
-                    document.getElementById('stat-subs').innerText = subCount > 9999 ? (subCount/1000).toFixed(1)+'K' : subCount;
-                    document.getElementById('stat-views').innerText = viewCount > 999999 ? (viewCount/1000000).toFixed(1)+'M' : (viewCount > 999 ? (viewCount/1000).toFixed(1)+'K' : viewCount);
-                    document.getElementById('stat-videos').innerText = videoCount;
+                    // VERİLERİ HAFIZAYA KAYDET
+                    localStorage.setItem('mali_hq_yt_data', JSON.stringify({
+                        title: snippet.title,
+                        subs: subCount,
+                        views: viewCount,
+                        videos: videoCount
+                    }));
 
-                    generateAIStrategy(subCount, viewCount, videoCount);
-                    updatePieChart(viewCount); 
+                    // SAYFAYI YENİLEYİP GÜNCEL VERİLERİ BAS
+                    window.location.reload();
                 }
             } catch {
                 document.getElementById('channel-name-txt').innerText = "Bağlantı Hatası!";
             }
         }
 
-        // MANUEL AI TEST FONKSİYONU
         function testGemini() {
             const subs = document.getElementById('test-subs').value || 5000;
             const views = document.getElementById('test-views').value || 100000;
@@ -292,7 +332,6 @@
             generateAIStrategy(subs, views, 25);
         }
 
-        // GERÇEK GEMINI AI MOTORU (GÜNCELLENDİ)
         async function generateAIStrategy(subs, views, videos) {
             let avgViews = videos > 0 ? Math.round(views / videos) : 0;
             let engagement = subs > 0 ? ((avgViews / subs) * 100).toFixed(1) : 0;
