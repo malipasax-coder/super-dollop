@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mali HQ | AI Command Center</title>
+    <title>Mali HQ | Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -12,16 +12,20 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; overflow-x: hidden; }
         
+        /* Cam Tasarımı */
         .glass-panel { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .glass-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
         .glass-card:hover { border-color: rgba(99, 102, 241, 0.5); background: rgba(30, 41, 59, 0.8); }
         
+        /* Mobil Menü Animasyonları */
         #sidebar { transition: transform 0.3s ease-in-out; }
         #sidebar-overlay { transition: opacity 0.3s ease-in-out; }
         .nav-item.active { background: linear-gradient(90deg, rgba(99,102,241,0.2) 0%, transparent 100%); border-left: 4px solid #6366f1; color: #fff; }
         
+        /* Mobilde Yatay Taşmayı Engelleme */
         * { box-sizing: border-box; max-width: 100%; }
         
+        /* Grafik Konteynerleri */
         .chart-container { position: relative; height: 200px; width: 100%; }
         @media (min-width: 768px) { .chart-container { height: 250px; } }
     </style>
@@ -49,13 +53,13 @@
             <div class="p-6 border-b border-slate-800 flex justify-between items-center">
                 <div>
                     <h1 class="text-xl md:text-2xl font-black text-white tracking-tighter">MALI<span class="text-indigo-500">.HQ</span></h1>
-                    <p class="text-[9px] text-slate-500 uppercase tracking-widest">AI Command v3.0</p>
+                    <p class="text-[9px] text-slate-500 uppercase tracking-widest">Mobil Command v2.1</p>
                 </div>
                 <button onclick="toggleMenu()" class="lg:hidden text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
             </div>
             
             <nav class="flex-1 py-4 space-y-1">
-                <a href="#" onclick="switchView('overview')" id="nav-overview" class="nav-item active flex items-center px-6 py-3 text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-chart-pie w-6 md:w-8"></i> <span class="font-bold text-xs md:text-sm uppercase tracking-wider">AI Strateji</span></a>
+                <a href="#" onclick="switchView('overview')" id="nav-overview" class="nav-item active flex items-center px-6 py-3 text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-chart-pie w-6 md:w-8"></i> <span class="font-bold text-xs md:text-sm uppercase tracking-wider">Analiz & Strateji</span></a>
                 <a href="#" onclick="switchView('radar')" id="nav-radar" class="nav-item flex items-center px-6 py-3 text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-satellite-dish w-6 md:w-8"></i> <span class="font-bold text-xs md:text-sm uppercase tracking-wider">Rakip Radarı</span></a>
                 <a href="#" onclick="switchView('social')" id="nav-social" class="nav-item flex items-center px-6 py-3 text-slate-400 hover:text-white transition-all"><i class="fa-brands fa-tiktok w-6 md:w-8"></i> <span class="font-bold text-xs md:text-sm uppercase tracking-wider">Sosyal Ağlar</span></a>
             </nav>
@@ -76,12 +80,12 @@
             <header class="glass-panel sticky top-0 z-30 px-4 md:px-6 py-3 flex justify-between items-center border-b border-slate-800">
                 <div class="flex items-center gap-3">
                     <button onclick="toggleMenu()" class="lg:hidden text-slate-300 hover:text-indigo-400 transition-colors"><i class="fa-solid fa-bars text-xl"></i></button>
-                    <h2 id="page-title" class="text-base md:text-xl font-black uppercase tracking-widest text-slate-200 truncate max-w-[150px] sm:max-w-xs">AI Strateji</h2>
+                    <h2 id="page-title" class="text-base md:text-xl font-black uppercase tracking-widest text-slate-200 truncate max-w-[150px] sm:max-w-xs">Analiz</h2>
                 </div>
                 <div class="flex items-center gap-2 md:gap-4">
                     <p id="clock" class="hidden sm:block text-slate-400 font-mono text-xs tracking-widest">00:00</p>
                     <button id="google-login-btn" onclick="authorizeGoogle()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase shadow-lg shadow-red-900/30 flex items-center gap-1.5 transition-all">
-                        <i class="fa-brands fa-youtube text-sm md:text-lg"></i> <span class="hidden sm:inline">Verileri Çek</span><span class="sm:hidden">Bağla</span>
+                        <i class="fa-brands fa-youtube text-sm md:text-lg"></i> <span class="hidden sm:inline">YouTube Bağla</span><span class="sm:hidden">Bağla</span>
                     </button>
                 </div>
             </header>
@@ -113,11 +117,21 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                         
-                        <div class="lg:col-span-1 glass-panel p-4 md:p-6 rounded-2xl border-l-4 border-indigo-500 relative overflow-hidden">
-                            <div class="absolute top-0 right-0 p-2 opacity-20"><i class="fa-solid fa-microchip text-6xl text-indigo-500"></i></div>
-                            <h3 class="text-[10px] md:text-sm font-bold text-indigo-400 uppercase tracking-widest mb-3 md:mb-4 flex items-center gap-2"><i class="fa-solid fa-brain"></i> Gemini AI Stratejisi</h3>
-                            <div id="ai-strategy-content" class="text-slate-200 text-xs md:text-sm leading-relaxed space-y-3 relative z-10">
-                                <p>YouTube kanal verilerin bekleniyor. Bağlandığında Gemini AI buraya sana özel operasyonel stratejini yazacak.</p>
+                        <div class="lg:col-span-1 glass-panel p-4 md:p-6 rounded-2xl border-l-4 border-indigo-500 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-[10px] md:text-sm font-bold text-indigo-400 uppercase tracking-widest mb-3 md:mb-4 flex items-center gap-2"><i class="fa-solid fa-brain"></i> Gemini AI Yorumu</h3>
+                                <div id="ai-strategy-content" class="text-slate-300 text-xs md:text-sm leading-relaxed space-y-3 mb-4">
+                                    <p>YouTube verisi bekleniyor. Sağ üstten YouTube'u bağla veya aşağıdan manuel test yap.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-3 border-t border-slate-700 mt-auto">
+                                <p class="text-[9px] text-slate-400 mb-1.5 font-bold uppercase"><i class="fa-solid fa-keyboard mr-1"></i>Manuel Zeka Testi</p>
+                                <div class="flex gap-1">
+                                    <input type="number" id="test-subs" placeholder="Abone" class="w-1/3 bg-slate-900 border border-slate-700 rounded p-1.5 text-[10px] text-white focus:outline-none focus:border-indigo-500">
+                                    <input type="number" id="test-views" placeholder="İzlenme" class="w-1/3 bg-slate-900 border border-slate-700 rounded p-1.5 text-[10px] text-white focus:outline-none focus:border-indigo-500">
+                                    <button onclick="testGemini()" class="w-1/3 bg-indigo-600 hover:bg-indigo-500 text-white text-[9px] font-bold rounded uppercase transition-colors">Sor</button>
+                                </div>
                             </div>
                         </div>
 
@@ -165,10 +179,9 @@
     </div>
 
     <script>
-        // API ANAHTARLARI
         const GOOGLE_CLIENT_ID = "419199949836-b07h29322b9rufpsop7g898dn4cne0vf.apps.googleusercontent.com"; 
         const YT_RADAR_KEY = "AIzaSyAH6zquJ9cC_vj2QTsKyYJW8tBWW6F4WWI"; 
-        const GEMINI_API_KEY = "AIzaSyAyKhEPqCXsi9dhloExXqf4tMEvuS-9ha0"; // Yeni AI Tapun!
+        const GEMINI_API_KEY = "AIzaSyAyKhEPqCXsi9dhloExXqf4tMEvuS-9ha0"; // GEMINI AI ANAHTARI EKLENDİ
         
         let tokenClient;
         let accessToken = null;
@@ -204,20 +217,25 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav-' + viewName).classList.add('active');
             
-            const titles = { 'overview': 'AI Strateji', 'radar': 'Rakip Radarı', 'social': 'Sosyal Ağlar' };
+            const titles = { 'overview': 'Analiz & Strateji', 'radar': 'Rakip Radarı', 'social': 'Sosyal Ağlar' };
             document.getElementById('page-title').innerText = titles[viewName];
 
-            ['overview', 'radar', 'social'].forEach(id => document.getElementById('view-' + id).classList.add('hidden'));
+            ['overview', 'radar', 'social'].forEach(id => {
+                document.getElementById('view-' + id).classList.add('hidden');
+            });
             document.getElementById('view-' + viewName).classList.remove('hidden');
 
             if(window.innerWidth < 1024) toggleMenu(); 
             if(viewName === 'radar' && document.getElementById('radar-container').innerHTML.includes('Beklemede')) scanRadar();
         }
 
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'}); }, 1000);
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'});
+        }, 1000);
 
         function initSystem() {
             renderCharts(); 
+            
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: GOOGLE_CLIENT_ID,
                 scope: 'https://www.googleapis.com/auth/youtube.readonly',
@@ -236,6 +254,7 @@
         async function fetchMyRealData() {
             try {
                 document.getElementById('channel-name-txt').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Bekleniyor';
+                
                 const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&mine=true`, { headers: { Authorization: `Bearer ${accessToken}` } });
                 const data = await res.json();
 
@@ -260,17 +279,29 @@
             }
         }
 
-        // --- GEMINI API ENTEGRASYONU ---
-        async function generateAIStrategy(subs, views, videos) {
-            const contentDiv = document.getElementById('ai-strategy-content');
-            contentDiv.innerHTML = '<p class="text-indigo-400 animate-pulse"><i class="fa-solid fa-microchip fa-spin mr-2"></i>Gemini verilerini işliyor...</p>';
+        // MANUEL AI TEST FONKSİYONU
+        function testGemini() {
+            const subs = document.getElementById('test-subs').value || 5000;
+            const views = document.getElementById('test-views').value || 100000;
+            
+            document.getElementById('stat-subs').innerText = subs;
+            document.getElementById('stat-views').innerText = views;
+            document.getElementById('stat-videos').innerText = "25";
+            document.getElementById('channel-name-txt').innerHTML = '<i class="fa-solid fa-flask text-indigo-400 mr-1"></i> Test Modu';
+            
+            generateAIStrategy(subs, views, 25);
+        }
 
+        // GERÇEK GEMINI AI MOTORU (GÜNCELLENDİ)
+        async function generateAIStrategy(subs, views, videos) {
             let avgViews = videos > 0 ? Math.round(views / videos) : 0;
             let engagement = subs > 0 ? ((avgViews / subs) * 100).toFixed(1) : 0;
             document.getElementById('engagement-rate').innerHTML = `Etkileşim Dönüşümü: <span class="text-white">%${engagement}</span>`;
 
-            // Gemini'ye giden komut
-            const prompt = `Sen acımasız ve vizyoner bir sosyal medya stratejistisin. Müşterinin YouTube kanalı verileri: Toplam Abone: ${subs}, Toplam İzlenme: ${views}, Video Sayısı: ${videos}. Bu verilere bakarak kanalın durumunu analiz et ve acil yapması gereken 1 büyüme taktiği ver. Yanıtını kısa, net, HTML formatında (sadece <p> ve <b> etiketleri kullanarak) ve maskülen, girişimci bir üslupla yaz. Robotik girişler yapma, direkt taktiğe gir.`;
+            const contentDiv = document.getElementById('ai-strategy-content');
+            contentDiv.innerHTML = '<p class="text-indigo-400 animate-pulse"><i class="fa-solid fa-microchip fa-spin mr-2"></i>Gemini verileri analiz ediyor...</p>';
+
+            const prompt = `Sen acımasız ve vizyoner bir sosyal medya stratejistisin. Müşterinin YouTube kanalı verileri: Toplam Abone: ${subs}, Toplam İzlenme: ${views}, Video Sayısı: ${videos}. Bu verilere bakarak kanalın durumunu analiz et ve acil yapması gereken 1 büyüme taktiği ver. Yanıtını kısa, net, HTML formatında (sadece <p> ve <b> etiketleri kullanarak) ve girişimci bir üslupla yaz. Robotik girişler yapma.`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -284,15 +315,14 @@
                 if(data.candidates && data.candidates.length > 0) {
                     contentDiv.innerHTML = data.candidates[0].content.parts[0].text;
                 } else {
-                    contentDiv.innerHTML = '<p class="text-red-500">Yapay zeka yanıt veremedi.</p>';
+                    contentDiv.innerHTML = '<p class="text-red-500">API yanıt vermedi. Limit aşılmış olabilir.</p>';
                 }
             } catch (error) {
-                contentDiv.innerHTML = '<p class="text-red-500"><i class="fa-solid fa-triangle-exclamation mr-2"></i>AI Bağlantısı Koptu!</p>';
-                console.error("Gemini Hatası:", error);
+                contentDiv.innerHTML = '<p class="text-red-500">Gemini bağlantı hatası!</p>';
+                console.error(error);
             }
         }
 
-        // --- RADAR ---
         async function scanRadar() {
             const list = document.getElementById('radar-container');
             list.innerHTML = '<div class="col-span-full text-center py-10 text-indigo-400 text-xs md:text-sm font-bold"><i class="fa-solid fa-radar fa-spin text-2xl md:text-3xl mb-3 block"></i>Tarama Yapılıyor...</div>';
@@ -318,7 +348,6 @@
             }
         }
 
-        // --- GRAFİKLER ---
         function renderCharts() {
             Chart.defaults.color = '#94a3b8';
             Chart.defaults.font.family = 'Inter';
@@ -345,14 +374,17 @@
                 data: {
                     labels: ['YouTube Önerilenler', 'YouTube Arama', 'Dış Kaynak (Discord vb)'],
                     datasets: [{
-                        data: [50, 30, 20],
+                        data: [50, 30, 20], 
                         backgroundColor: ['#ec4899', '#6366f1', '#1e293b'],
-                        borderWidth: 0, hoverOffset: 4
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false, cutout: '70%',
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 9} } } }
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 9} } } 
+                    }
                 }
             });
         }
